@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Mobile Programming Cheat Sheet A4</title>
+  <style>
+    /* ตั้งค่าหน้ากระดาษ A4 แนวตั้ง (Portrait) */
+    @page {
+      size: A4 portrait;
+      margin: 1cm;
+    }
+
+    body {
+      font-family: 'Consolas', monospace;
+      font-size: 8.5pt;
+      line-height: 1.15;
+      margin: 0;
+      color: #000;
+    }
+
+    h1 {
+      font-family: 'Tahoma', sans-serif;
+      font-size: 14pt;
+      text-align: center;
+      margin: 0 0 10px 0;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      font-family: 'Tahoma', sans-serif;
+      font-size: 9.5pt;
+      background: #e2e8f0;
+      padding: 3px 5px;
+      margin: 5px 0 3px 0;
+      border-bottom: 2px solid #334155;
+      break-after: avoid;
+      /* ห้ามตัดหน้าหลัง H2 */
+    }
+
+    /* ใช้ 2 คอลัมน์สำหรับหน้ากระดาษ A4 เพื่อยัดโค้ดให้คุ้มที่สุด */
+    .container {
+      column-count: 2;
+      column-gap: 20px;
+      column-fill: auto;
+    }
+
+    /* กล่องเก็บโค้ดให้กะทัดรัดสุดๆ */
+    pre {
+      margin: 0 0 5px 0;
+      padding: 4px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      border-radius: 4px;
+      break-inside: avoid;
+      /* ป้องกันโค้ดโดนตัดครึ่งกลางคอลัมน์ */
+    }
+
+    code {
+      font-family: 'Consolas', monospace;
+    }
+
+    .c {
+      color: #16a34a;
+      font-style: italic;
+    }
+
+    /* Comment สีเขียว */
+    .k {
+      color: #2563eb;
+      font-weight: bold;
+    }
+
+    /* Keyword สีน้ำเงิน */
+    .s {
+      color: #b91c1c;
+    }
+
+    /* String สีแดง */
+
+    /* สำหรับการสลับสีกรอบนิดหน่อยเพื่อให้อ่านง่ายตอนพิมพ์ */
+    .box {
+      break-inside: avoid;
+      margin-bottom: 8px;
+    }
+
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="no-print" style="text-align: center; margin-bottom: 10px;">
+    <a href="ExamSummary.html"
+      style="background: #334155; color: #fff; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-family: 'Tahoma', sans-serif; font-size: 10pt;">🔙
+      กลับไปหน้าสรุปเนื้อหาหลัก</a>
+    <button onclick="window.print()"
+      style="background: #2563eb; color: #fff; padding: 6px 12px; border: none; border-radius: 4px; font-family: 'Tahoma', sans-serif; font-size: 10pt; margin-left: 10px; cursor: pointer;">🖨️
+      สั่งปริ้นหน้านี้</button>
+  </div>
+  <h1>โพยสอบเขียนโค้ด Mobile Programming (A4)</h1>
+  <div class="container">
+
+    <div class="box">
+      <h2>1. INTENTS & ACTIVITY RESULTS</h2>
+      <pre><code><span class="c">// 1. ACTION_DIAL (หน้าโทรออก)</span>
+String data = <span class="s">"tel:555-1234"</span>;
+Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse(data));
+startActivity(intent); <span class="c">// Manifest: CALL_PHONE</span>
+
+<span class="c">// 2. WEB_SEARCH (ค้นหาผ่าน Google)</span>
+Intent i = new Intent(Intent.ACTION_WEB_SEARCH);
+i.putExtra(SearchManager.QUERY, <span class="s">"golf clubs"</span>);
+startActivity(i);
+
+<span class="c">// 3. GEO MAP (แผนที่)</span>
+String p = <span class="s">"Cleveland State University"</span>;
+Intent iGeo = new Intent(Intent.ACTION_VIEW, Uri.parse(<span class="s">"geo:0,0?q=("</span>+p+<span class="s">")"</span>));
+startActivity(iGeo);
+
+<span class="c">// 4. Start for Result (เรียกหน้าลูกและรอรับค่า)</span>
+startActivityForResult(intent, <span class="s">1234</span>);
+
+<span class="c">// ในหน้าลูก (Child) เมื่อเสร็จงานส่งค่ากลับ:</span>
+setResult(Activity.RESULT_OK); 
+finish();
+
+<span class="c">// รับค่ากลับในหน้าแม่ (Parent)</span>
+@Override
+protected void onActivityResult(int reqCode, int resCode, Intent data) {
+  if(reqCode == <span class="s">1234</span> && resCode == RESULT_OK) {
+      <span class="c">// ทำงานต่อ...</span>
+  }
+}</code></pre>
+    </div>
+
+    <div class="box">
+      <h2>2. SQLITE DATABASE (ข้อมูลท้องถิ่น)</h2>
+      <pre><code><span class="c">// เปิดหรือสร้างฐานข้อมูล</span>
+SQLiteDatabase db = this.openOrCreateDatabase(<span class="s">"mydb"</span>, MODE_PRIVATE, null);
+<span class="c">// หรือ:</span> db = SQLiteDatabase.openDatabase(path, null, SQLiteDatabase.CREATE_IF_NECESSARY);
+
+<span class="c">// สร้าง Table (ใช้วิธีรัน SQL ตรงๆ)</span>
+db.execSQL(<span class="s">"CREATE TABLE tb1 (recID integer PRIMARY KEY autoincrement, name text, phone text)"</span>);
+
+<span class="c">// INSERT (ใช้ ContentValues) แนะนำวิธีนี้</span>
+ContentValues vals = new ContentValues();
+vals.put(<span class="s">"name"</span>, <span class="s">"ABC"</span>); 
+vals.put(<span class="s">"phone"</span>, <span class="s">"555-1010"</span>);
+long rowId = db.insert(<span class="s">"tb1"</span>, null, vals);
+
+<span class="c">// UPDATE (อัปเดตข้อมูล)</span>
+ContentValues upd = new ContentValues();
+upd.put(<span class="s">"name"</span>, <span class="s">"Maria"</span>);
+int recAffected = db.update(<span class="s">"tb1"</span>, upd, <span class="s">"recID = ?"</span>, new String[]{<span class="s">"1"</span>});
+
+<span class="c">// DELETE (ลบข้อมูล)</span>
+db.delete(<span class="s">"tb1"</span>, <span class="s">"recID > ? AND name = ?"</span>, new String[]{<span class="s">"5"</span>, <span class="s">"Maria"</span>});
+
+<span class="c">// QUERY & CURSOR (ดึงข้อมูลมาอ่าน)</span>
+Cursor c = db.rawQuery(<span class="s">"SELECT * FROM tb1"</span>, null);
+<span class="c">// หรือพารามิเตอร์:</span> db.rawQuery(<span class="s">"SELECT * FROM tb1 WHERE name=?"</span>, new String[]{<span class="s">"ABC"</span>});
+c.moveToPosition(-1); <span class="c">// ถอยไปจุดเริ่มก่อน</span>
+while(c.moveToNext()) {
+  int id = c.getInt(0); <span class="c">// index คอลัมน์</span>
+  String name = c.getString(1); 
+  <span class="c">// ใช้ชื่อคอลัมน์หา index ได้</span>
+  String phone = c.getString(c.getColumnIndex(<span class="s">"phone"</span>));
+}
+c.close();
+
+<span class="c">// TRANSACTIONS (ป้องกัน Error ลบ/เขียนไม่สมบูรณ์)</span>
+db.beginTransaction();
+try {
+  <span class="c">// .. รัน SQL ..</span>
+  db.setTransactionSuccessful(); <span class="c">// ยืนยัน Commit</span>
+} catch (SQLiteException e) {
+} finally { 
+  db.endTransaction(); <span class="c">// คืนสถานะ</span>
+}</code></pre>
+    </div>
+
+    <div class="box">
+      <h2>3. WEBVIEW & MIXED MODE</h2>
+      <pre><code><span class="c">// อย่าลืม Permission ใน AndroidManifest.xml</span>
+<span class="c">// &lt;uses-permission android:name="android.permission.INTERNET"/&gt;</span>
+
+WebView webview = (WebView) findViewById(R.id.webView1);
+<span class="c">// จำเป็นต้องเปิด JS เพราะค่าเริ่มคือ false</span>
+webview.getSettings().setJavaScriptEnabled(true);
+<span class="c">// ป้องกันไม่ให้แอปเด้งไปบราวเซอร์เครื่องอื่น</span>
+webview.setWebViewClient(new WebViewClient());
+
+<span class="c">// โหลดเว็บจาก URL</span>
+webview.loadUrl(<span class="s">"http://www.ebay.com"</span>);
+
+<span class="c">// โหลด HTML String ดิบๆ ลงไปเลย</span>
+String html = <span class="s">"&lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;"</span>;
+webview.loadData(html, <span class="s">"text/html"</span>, <span class="s">"UTF-8"</span>);
+
+<span class="c">// การคุม Navigation ปุ่มถอย/เดินหน้า</span>
+if(webview.canGoBack()) webview.goBack();
+if(webview.canGoForward()) webview.goForward();
+webview.reload();
+webview.clearCache(true);
+</code></pre>
+    </div>
+
+    <div class="box">
+      <h2>4. CANVAS (วาดกราฟิก 2D)</h2>
+      <pre><code><span class="c">// ต้องสร้างคลาสย่อย extends View แล้ว Override onDraw</span>
+@Override
+protected void onDraw(Canvas canvas) {
+  super.onDraw(canvas);
+  Paint paint = new Paint();
+  paint.setStyle(Paint.Style.FILL);
+  paint.setColor(Color.parseColor(<span class="s">"#CD5C5C"</span>));
+  
+  <span class="c">// วาดวงกลม (พิกัด x, y, รัศมี, ออปเจกต์สี)</span>
+  canvas.drawCircle(150, 200, 50, paint);
+  
+  <span class="c">// วาดสี่เหลี่ยมขอบมน (ซ้าย, บน, กว้าง, สูง) , โค้ง x, โค้ง y</span>
+  canvas.drawRoundRect(new RectF(20,20,100,100), 20, 20, paint);
+  
+  <span class="c">// หมุนผืนผ้าใบก่อนวาดข้อความ</span>
+  canvas.rotate(-45);
+  canvas.drawText(<span class="s">"Tutorial"</span>, 40, 180, paint);
+  canvas.restore();
+}</code></pre>
+    </div>
+
+    <div class="box">
+      <h2>5. ANIMATION (ฟิสิกส์ & เฟรม)</h2>
+      <pre><code><span class="c">// 1. Drawable Animation (Frame by Frame จาก XML)</span>
+ImageView img = findViewById(R.id.rocket_image);
+img.setBackgroundResource(R.drawable.rocket_thrust);
+AnimationDrawable anim = (AnimationDrawable) img.getBackground();
+anim.start();
+
+<span class="c">// 2. Spring Animation (Physics-based เด้งดึ๋ง)</span>
+SpringAnimation spAnim = new SpringAnimation(img, DynamicAnimation.TRANSLATION_Y);
+spAnim.setStartVelocity(1000f);
+spAnim.start();
+
+<span class="c">// 3. Fling Animation (เคลื่อนที่แล้วค่อยๆ หยุดตามแรงเสียดทาน)</span>
+FlingAnimation fling = new FlingAnimation(this, DynamicAnimation.ROTATION_X);
+fling.setStartVelocity(150)
+     .setMinValue(0)
+     .setMaxValue(1000)
+     .setFriction(0.1f)
+     .start();</code></pre>
+    </div>
+
+    <div class="box">
+      <h2>6. ALARM MANAGER (ตั้งเวลาทำงาน)</h2>
+      <pre><code>Intent i = new Intent(this, AlarmReceiver.class);
+<span class="c">// สั่งให้ PendingIntent ไปปลุก BroadcastReceiver</span>
+PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, i, 0);
+
+AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+<span class="c">// สั่งทำซ้ำๆ ทุก 10 วิ (10000ms) อิงตามเวลาจริงโลก</span>
+alarm.setRepeating(AlarmManager.RTC_WAKEUP, 
+    cal.getTimeInMillis(), 10000, pIntent);
+
+<span class="c">// การยกเลิก</span>
+alarm.cancel(pIntent);</code></pre>
+    </div>
+
+    <div class="box">
+      <h2>7. MULTIMEDIA (เล่นเสียง/วิดีโอ)</h2>
+      <pre><code><span class="c">// เล่นไฟล์เสียงที่มีอยู่ในโปรเจกต์ (res/raw/song.mp3)</span>
+MediaPlayer mp = MediaPlayer.create(this, R.raw.song);
+mp.start(); <span class="c">// เล่น</span>
+mp.pause(); <span class="c">// หยุดชั่วคราว</span>
+
+<span class="c">// เล่นไฟล์เสียงผ่านอินเทอร์เน็ต (URL)</span>
+MediaPlayer m2 = new MediaPlayer();
+m2.setAudioStreamType(AudioManager.STREAM_MUSIC);
+m2.setDataSource(getApplicationContext(), Uri.parse(<span class="s">"http://..."</span>));
+m2.prepare(); <span class="c">// **ห้ามลืม ต้องเตรียมไฟล์ก่อนโหลดเน็ต**</span>
+m2.start();</code></pre>
+    </div>
+
+    <div class="box">
+      <h2>8. OPENGL ES (ตั้งค่า 3D พื้นฐาน)</h2>
+      <pre><code><span class="c">&lt;!-- AndroidManifest.xml --&gt;</span>
+&lt;uses-feature android:glEsVersion=<span class="s">"0x00030001"</span> android:required=<span class="s">"true"</span> /&gt;
+
+<span class="c">// ในคลาส Renderer (ต้อง implements GLSurfaceView.Renderer)</span>
+public void onSurfaceCreated(GL10 unused, EGLConfig config) {
+    <span class="c">// กำหนดสีพื้นหลัง RGBA</span>
+    GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+}
+public void onDrawFrame(GL10 unused) {
+    <span class="c">// ล้างสีเก่าทิ้งเตรียมวาดใหม่เฟรมต่อเฟรม</span>
+    GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+}</code></pre>
+    </div>
+
+    <div class="box">
+      <h2>9. NOTIFICATION (Builder & Channel)</h2>
+      <pre><code><span class="c">// สำคัญ: ต้องสร้าง Notification Channel ก่อนในเครื่อง Android 8+</span>
+NotificationCompat.Builder builder = new NotificationCompat.Builder(this, <span class="s">"CHANNEL_ID"</span>)
+    .setSmallIcon(R.drawable.ic_alert) <span class="c">// *ขาดไม่ได้ ไม่งั้น Crash*</span>
+    .setContentTitle(<span class="s">"แจ้งเตือน"</span>)
+    .setContentText(<span class="s">"เนื้อหา..."</span>)
+    .setPriority(NotificationCompat.PRIORITY_HIGH)
+    .setStyle(new NotificationCompat.BigTextStyle().bigText(<span class="s">"ข้อความยาวมากๆ"</span>))
+    .setContentIntent(pendingIntent); <span class="c">// ใส่เมื่อต้องการให้กดได้</span>
+    
+NotificationManagerCompat manager = NotificationManagerCompat.from(this);
+manager.notify(1, builder.build());</code></pre>
+    </div>
+
+  </div>
+</body>
+
+</html>
